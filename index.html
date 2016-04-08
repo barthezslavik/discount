@@ -31,16 +31,31 @@
                   <h4 class="modal-title" id="myModalLabel">Add item</h4>
               </div>
               <div class="modal-body">
-                <select class="form-control"
-                  ng-options="option.name for option in item_types track by option.id"
-                  ng-model="current_type"
-                  ng-change="update()">
-                </select>
-                <br>
-                <select class="form-control"
-                  ng-options="option.name for option in current track by option.id"
-                  ng-model="data">
-                </select>
+                <div class="form-group">
+                  <select class="form-control"
+                    ng-options="option.name for option in types track by option.id"
+                    ng-model="formData.type"
+                    ng-change="updateList()">
+                  </select>
+                </div>
+                <div class="form-group">
+                  <select class="form-control"
+                    ng-change="updateDescription()"
+                    ng-show="current.length"
+                    ng-options="option.name for option in current track by option.id"
+                    ng-model="formData.name">
+                  </select>
+                </div>
+                <div class="form-group">
+                  <input type="text" class="form-control"
+                    placeholder="Description"
+                    ng-model="formData.description">
+                </div>
+                <div class="form-group">
+                  <input type="text" class="form-control"
+                    placeholder="Value"
+                    ng-model="formData.value">
+                </div>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click=add()>Create</button>

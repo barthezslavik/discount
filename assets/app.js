@@ -1,10 +1,22 @@
 angular.module('app', [])
   .controller('mainController', function($scope) {
     $scope.list = [];
+    $scope.formData = {};
 
-    $scope.update = function() {
-      var name = $scope.current_type;
-      $scope.current = $scope[name.id];
+    $scope.updateList = function() {
+      delete($scope.formData.name);
+      delete($scope.formData.description);
+      delete($scope.formData.value);
+      if ($scope.formData.type.id == "gadgets") {
+        $scope.current = $scope.gadgets;
+      } else {
+        $scope.current = []
+      }
+    }
+
+    $scope.updateDescription = function() {
+      $scope.formData.description = $scope.formData.name.name
+      $scope.formData.value = $scope.formData.name.cost
     }
 
     $scope.add = function() {
@@ -12,7 +24,7 @@ angular.module('app', [])
       delete($scope.data)
     }
 
-    $scope.item_types = [
+    $scope.types = [
       { id: 'gadgets', name: "Gadgets" },
       { id: 'fixed_discounts', name: "Fixed discount" },
       { id: 'percent_discounts', name: "Percent discount" },
@@ -32,24 +44,4 @@ angular.module('app', [])
       },
     ];
 
-    $scope.fixed_discounts = [
-      {
-        name: "Old Client Discount",
-        cost: 20,
-      },
-    ];
-
-    $scope.percent_discounts = [
-      {
-        name: "Student Discount",
-        cost: "20",
-      },
-    ];
-
-    $scope.fees = [
-      {
-        name: "Courier fee",
-        cost: 20
-      }
-    ];
 });
