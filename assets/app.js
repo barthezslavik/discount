@@ -56,10 +56,18 @@ angular.module('app', [])
       sortableElement.refresh();
     }
 
+    $scope.sendInvoice = function() {
+      $.ajax({
+        type: "POST",
+        url: "saveinvoice",
+        contentType: 'application/json',
+        data: JSON.stringify($scope.sortableArray)
+      });
+    }
+
     $scope.setValues = function(data) {
       angular.forEach(data, function(object, key) {
         object.cost = Number(object.cost);
-        object.default_cost = object.cost;
         if (object.quantity == undefined) object.quantity = 1;
         object.total_cost = object.quantity*object.cost;
         object.rest = object.total_cost;
