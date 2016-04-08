@@ -2,6 +2,7 @@ angular.module('app', [])
   .controller('mainController', function($scope) {
     $scope.data = [];
     $scope.formData = {};
+    var sortableElement;
 
     $scope.types = [
       { id: 'gadgets', name: "Gadgets" },
@@ -11,13 +12,50 @@ angular.module('app', [])
     ];
 
     $scope.data = [
-      { description: "Gadget_221", each_cost: "($100 each)", value: 200, quantity: 2, cost: 100},
-      { description: "Old Client Discount", each_cost: "($20)", value: 200, quantity: 2, cost: 100},
-      { description: "Gadget_113", each_cost: "($50 each)", discount: "(-20% = $120)", value: 150, quantity: 3, cost: 50},
-      { description: "Air shipping fee", each_cost: "($50)", discount: "(-20% = $40)", value: 50, quantity: 1, cost: 50},
-      { description: "Student Discount (20%)", discount: "(Total discount = -$40)"},
-      { description: "Courier fee", each_cost: "($20)"},
-    ]
+      {
+        description: "Gadget_221",
+        cost_string: "($100 each)",
+        value: 200,
+        quantity: 2,
+        cost: 100
+      },
+      {
+        description: "Old Client Discount",
+        cost: -20,
+        cost_string: "($20)",
+        is_discount: true,
+        type: "value"
+      },
+      {
+        description: "Gadget_113",
+        cost_string: "($50 each)",
+        discount: "(-20% = $120)",
+        value: 150,
+        quantity: 3,
+        cost: 50,
+        total_string: "<h1>11</h1>"
+      },
+      {
+        description: "Air shipping fee",
+        cost_string: "($50)",
+        discount: "(-20% = $40)",
+        value: 50,
+        quantity: 1,
+        cost: 50
+      },
+      {
+        description: "Student Discount (20%)",
+        discount: "(Total discount = -$40)",
+        cost: 20,
+        is_discount: true,
+        type: "percent"
+      },
+      {
+        description: "Courier fee",
+        cost: 20,
+        cost_string: "($20)"
+      },
+    ];
 
     $scope.gadgets = [
       {
@@ -52,24 +90,11 @@ angular.module('app', [])
 
     $scope.add = function() {
       $scope.formData.cost = $scope.formData.name.cost;
-      $scope.count_discount();
+      $scope.data.push($scope.formData)
       $scope.formData = {};
     }
 
-    $scope.count_discount = function() {
-      $scope.data.push($scope.formData)
-    }
-
-    var sortableEle;
-
-    $scope.sortableArray = [
-      'One', 'Two', 'Three'
-    ];
-
-    $scope.add = function() {
-      $scope.sortableArray.push('Item: '+$scope.sortableArray.length);
-      sortableEle.refresh();
-    }
+    $scope.sortableArray = $scope.data;
 
     $scope.dragStart = function(e, ui) {
       ui.item.data('start', ui.item.index());
@@ -81,11 +106,34 @@ angular.module('app', [])
 
       $scope.sortableArray.splice(end, 0,
       $scope.sortableArray.splice(start, 1)[0]);
-
+      $scope.findDiscounts($scope.sortableArray);
       $scope.$apply();
     }
 
-    sortableEle = $('#sortable').sortable({
+    $scope.findDiscounts = function(array) {
+      var list = [];
+      angular.forEach(array, function(object, key) {
+        list.push(object);
+        if (object.is_discount == true) {
+          $scope.applyDiscount(object, list);
+          list = [];
+        }
+      });
+    }
+
+    $scope.applyDiscount = function(discount, list) {
+      if (discount.type == "percent") {
+        angular.forEach(list, function(item, key) {
+          if (item.discount != true) {
+            item.total_cost = item.cost*item.quantity;
+            item.rest = item.total_cost - item.total_cost*(discount.cost/100);
+            item.strike_string = "$" + item.total_cost + " (-"+ discount.cost +"% = $"+ item.rest +")" ;
+          }
+        });
+      }
+    }
+
+    sortableElement = $('#sortable').sortable({
       start: $scope.dragStart,
       update: $scope.dragEnd
     });
