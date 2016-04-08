@@ -2,7 +2,6 @@ angular.module('app', [])
   .controller('mainController', function($scope) {
     $scope.data = [];
     $scope.formData = {};
-    var sortableElement;
 
     $scope.types = [
       { id: 'gadgets', name: "Gadgets" },
@@ -41,27 +40,53 @@ angular.module('app', [])
       $scope.formData.cost = $scope.formData.name.cost;
     }
 
-    $scope.add = function() {
+    $scope.addItem = function() {
       $scope.data.push($scope.formData)
       $scope.formData = {};
       $scope.sortableArray = $scope.data;
       $scope.setValues($scope.sortableArray);
+      $scope.findDiscounts($scope.sortableArray);
+      $scope.calculateTotal();
+    }
+
+    var sortableElement;
+
+    $scope.add = function() {
+      $scope.sortableArray.push('Item: '+$scope.sortableArray.length);
+      sortableElement.refresh();
     }
 
     $scope.setValues = function(data) {
-      $scope.total = 0;
-
       angular.forEach(data, function(object, key) {
         object.cost = Number(object.cost);
+        object.default_cost = object.cost;
         if (object.quantity == undefined) object.quantity = 1;
-        if (object.type.id == "fixed_discounts") object.is_discount = true;
-
         object.total_cost = object.quantity*object.cost;
+        object.rest = object.total_cost;
+
+        if (object.type.id == "fixed_discounts") {
+          object.total_cost = object.total_cost*(-1);
+          object.rest = object.total_cost;
+        }
+
+        if (object.type.id == "percent_discounts") {
+          object.rest = 0;
+        }
+
+        $scope.decorate(object);
+      });
+    }
+
+    $scope.decorate = function(object) {
+      if (object.type.id == "percent_discounts") {
+        object.cost_string = "("+object.cost+"%)";
+      }
+      if (object.type.id != "percent_discounts") {
+        object.rest = object.total_cost;
         object.total_cost_string = "$"+object.total_cost;
 
-        if (object.is_discount) {
-          object.total_cost_string = "-$"+object.total_cost;
-          object.total_cost = object.total_cost*(-1);
+        if (object.type.id == "fixed_discounts") {
+          object.total_cost_string = "-$"+object.total_cost*(-1);
         }
 
         if (object.quantity > 1) {
@@ -69,8 +94,24 @@ angular.module('app', [])
         } else {
           object.cost_string = "($"+object.cost+")";
         }
+      }
+    }
 
-        $scope.total += object.total_cost;
+    $scope.calculateTotal = function() {
+      $scope.total = 0;
+      angular.forEach($scope.sortableArray, function(object, key) {
+        $scope.total += object.rest;
+      });
+      if ($scope.total < 0) {
+        $scope.total = "-$"+$scope.total*(-1);
+      } else {
+        $scope.total = "$"+$scope.total;
+      }
+    }
+
+    $scope.resetValues = function() {
+      angular.forEach($scope.sortableArray, function(object, key) {
+        $scope.decorate(object);
       });
     }
 
@@ -83,35 +124,35 @@ angular.module('app', [])
       end = ui.item.index();
       $scope.sortableArray.splice(end, 0,
       $scope.sortableArray.splice(start, 1)[0]);
+      $scope.resetValues();
       $scope.findDiscounts($scope.sortableArray);
+      $scope.calculateTotal();
       $scope.$apply();
     }
 
     $scope.findDiscounts = function(array) {
       var list = [];
       angular.forEach(array, function(object, key) {
-        list.push(object);
-        if (object.is_discount == true) {
-          object.total_cost = object.cost;
+        if (object.type.id == "percent_discounts") {
           $scope.applyDiscount(object, list);
           list = [];
+        } else {
+          if (object.type.id != "fixed_discounts") {
+            list.push(object);
+          }
         }
       });
     }
 
     $scope.applyDiscount = function(discount, list) {
-      if (discount.type == "percent") {
-        discount.total_cost = 0;
-        angular.forEach(list, function(item, key) {
-          if (item.is_discount != true) {
-            item.total_cost = item.cost*item.quantity;
-            item.rest = item.total_cost - item.total_cost*(discount.cost/100);
-            item.strike_string = "$" + item.total_cost + " (-"+ discount.cost +"% = $"+ item.rest +")" ;
-            total_discount = (item.total_cost - item.rest);
-            discount.total_cost += total_discount;
-          }
-        });
-      }
+      var total_discount = 0
+      angular.forEach(list, function(item, key) {
+        item.total_cost = item.cost*item.quantity;
+        item.rest = item.total_cost - item.total_cost*(discount.cost/100);
+        item.total_cost_string = "$" + item.total_cost + " (-"+ discount.cost +"% = $"+ item.rest +")" ;
+        total_discount += (item.total_cost - item.rest);
+      });
+      discount.total_cost_string = "(Total discount: -$"+ total_discount +")"
     }
 
     sortableElement = $('#sortable').sortable({

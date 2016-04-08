@@ -16,13 +16,13 @@
         <div id="sortable">
           <div class="row" ng-repeat="d in data">
             <div class="col-xs-4">
-              <span ng-show="d.quantity">{{d.quantity}} x</span>
+              <span ng-show="d.quantity != 1">{{d.quantity}} x</span>
               {{d.description}}
               {{d.cost_string}}
             </div>
             <div class="col-xs-4">
               =
-              {{d.strike_string || d.total_cost_string}}
+              {{d.total_cost_string}}
             </div>
           </div>
         </div>
@@ -32,7 +32,7 @@
             Total:
           </div>
           <div class="col-xs-4" ng-show="total">
-            = ${{total}}
+            = {{total}}
           </div>
         </div>
         <br>
@@ -81,7 +81,7 @@
                 </div>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click=add()>Create</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click=addItem()>Create</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
               </div>
             </div>
