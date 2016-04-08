@@ -11,52 +11,6 @@ angular.module('app', [])
       { id: 'fees', name: "Fees" }
     ];
 
-    $scope.data = [
-      {
-        description: "Gadget_221",
-        cost_string: "($100 each)",
-        value: 200,
-        quantity: 2,
-        cost: 100
-      },
-      {
-        description: "Old Client Discount",
-        cost: -20,
-        cost_string: "($20)",
-        is_discount: true,
-        type: "value"
-      },
-      {
-        description: "Gadget_113",
-        cost_string: "($50 each)",
-        discount: "(-20% = $120)",
-        value: 150,
-        quantity: 3,
-        cost: 50,
-        total_string: "<h1>11</h1>"
-      },
-      {
-        description: "Air shipping fee",
-        cost_string: "($50)",
-        discount: "(-20% = $40)",
-        value: 50,
-        quantity: 1,
-        cost: 50
-      },
-      {
-        description: "Student Discount (20%)",
-        discount: "(Total discount = -$40)",
-        cost: 20,
-        is_discount: true,
-        type: "percent"
-      },
-      {
-        description: "Courier fee",
-        cost: 20,
-        cost_string: "($20)"
-      },
-    ];
-
     $scope.gadgets = [
       {
         id: 1,
@@ -73,7 +27,6 @@ angular.module('app', [])
     $scope.updateList = function() {
       delete($scope.formData.name);
       delete($scope.formData.description);
-      delete($scope.formData.value);
       delete($scope.formData.quantity);
 
       if ($scope.formData.type.id == "gadgets") {
@@ -85,16 +38,41 @@ angular.module('app', [])
 
     $scope.updateDescription = function() {
       $scope.formData.description = $scope.formData.name.name;
-      $scope.formData.value = $scope.formData.name.cost;
+      $scope.formData.cost = $scope.formData.name.cost;
     }
 
     $scope.add = function() {
-      $scope.formData.cost = $scope.formData.name.cost;
       $scope.data.push($scope.formData)
       $scope.formData = {};
+      $scope.sortableArray = $scope.data;
+      $scope.setValues($scope.sortableArray);
     }
 
-    $scope.sortableArray = $scope.data;
+    $scope.setValues = function(data) {
+      $scope.total = 0;
+
+      angular.forEach(data, function(object, key) {
+        object.cost = Number(object.cost);
+        if (object.quantity == undefined) object.quantity = 1;
+        if (object.type.id == "fixed_discounts") object.is_discount = true;
+
+        object.total_cost = object.quantity*object.cost;
+        object.total_cost_string = "$"+object.total_cost;
+
+        if (object.is_discount) {
+          object.total_cost_string = "-$"+object.total_cost;
+          object.total_cost = object.total_cost*(-1);
+        }
+
+        if (object.quantity > 1) {
+          object.cost_string = "($"+object.cost+" each)";
+        } else {
+          object.cost_string = "($"+object.cost+")";
+        }
+
+        $scope.total += object.total_cost;
+      });
+    }
 
     $scope.dragStart = function(e, ui) {
       ui.item.data('start', ui.item.index());
@@ -103,7 +81,6 @@ angular.module('app', [])
     $scope.dragEnd = function(e, ui) {
       var start = ui.item.data('start'),
       end = ui.item.index();
-
       $scope.sortableArray.splice(end, 0,
       $scope.sortableArray.splice(start, 1)[0]);
       $scope.findDiscounts($scope.sortableArray);
@@ -115,6 +92,7 @@ angular.module('app', [])
       angular.forEach(array, function(object, key) {
         list.push(object);
         if (object.is_discount == true) {
+          object.total_cost = object.cost;
           $scope.applyDiscount(object, list);
           list = [];
         }
@@ -123,11 +101,14 @@ angular.module('app', [])
 
     $scope.applyDiscount = function(discount, list) {
       if (discount.type == "percent") {
+        discount.total_cost = 0;
         angular.forEach(list, function(item, key) {
-          if (item.discount != true) {
+          if (item.is_discount != true) {
             item.total_cost = item.cost*item.quantity;
             item.rest = item.total_cost - item.total_cost*(discount.cost/100);
             item.strike_string = "$" + item.total_cost + " (-"+ discount.cost +"% = $"+ item.rest +")" ;
+            total_discount = (item.total_cost - item.rest);
+            discount.total_cost += total_discount;
           }
         });
       }

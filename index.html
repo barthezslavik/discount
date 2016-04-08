@@ -22,16 +22,17 @@
             </div>
             <div class="col-xs-4">
               =
-              {{d.strike_string}}
+              {{d.strike_string || d.total_cost_string}}
             </div>
           </div>
         </div>
+        <hr>
         <div class="row">
           <div class="col-xs-4">
             Total:
           </div>
-          <div class="col-xs-4">
-            = $ 360
+          <div class="col-xs-4" ng-show="total">
+            = ${{total}}
           </div>
         </div>
         <br>
@@ -69,8 +70,8 @@
                 </div>
                 <div class="form-group">
                   <input type="text" class="form-control"
-                    placeholder="Value"
-                    ng-model="formData.value">
+                    placeholder="Cost"
+                    ng-model="formData.cost">
                 </div>
                 <div class="form-group">
                   <input type="text" class="form-control"
