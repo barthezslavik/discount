@@ -13,11 +13,25 @@
       <div ng-controller="mainController" class="container">
         <br>
 
-        <div class="row" ng-repeat="l in list">
-          <div class="col-xs-3">{{l.name}}</div>
-          <div class="col-xs-3">{{l.cost}}</div>
+        <div class="row" ng-repeat="d in data">
+          <div class="col-xs-4">
+            <span ng-show="d.quantity">{{d.quantity}} x</span>
+            {{d.description}}
+            {{d.each_cost}}
+          </div>
+          <div class="col-xs-4">
+            =
+            $ {{d.value}}
+          </div>
         </div>
-
+        <div class="row">
+          <div class="col-xs-4">
+            Total:
+          </div>
+          <div class="col-xs-4">
+            = $ 360
+          </div>
+        </div>
         <br>
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
           Add Item
@@ -55,6 +69,12 @@
                   <input type="text" class="form-control"
                     placeholder="Value"
                     ng-model="formData.value">
+                </div>
+                <div class="form-group">
+                  <input type="text" class="form-control"
+                    placeholder="Quantity"
+                    ng-show="current.length"
+                    ng-model="formData.quantity">
                 </div>
               </div>
               <div class="modal-footer">
