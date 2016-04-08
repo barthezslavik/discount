@@ -3,6 +3,7 @@
     <meta charset=utf-8 />
     <script src="assets/angular.min.js"></script>
     <script src="assets/jquery.min.js"></script>
+    <script src="assets/jquery-ui.js"></script>
     <script src="assets/bootstrap.min.js"></script>
     <script src="assets/app.js"></script>
     <link href="assets/bootstrap.min.css" rel="stylesheet" media="all" />
@@ -11,17 +12,17 @@
   <body>
     <div ng-app="myApp">
       <div ng-controller="mainController" class="container">
-        <br>
-
-        <div class="row" ng-repeat="d in data">
-          <div class="col-xs-4">
-            <span ng-show="d.quantity">{{d.quantity}} x</span>
-            {{d.description}}
-            {{d.each_cost}}
-          </div>
-          <div class="col-xs-4">
-            =
-            $ {{d.value}}
+        <div id="sortable">
+          <div class="row" ng-repeat="d in data">
+            <div class="col-xs-4">
+              <span ng-show="d.quantity">{{d.quantity}} x</span>
+              {{d.description}}
+              {{d.each_cost}}
+            </div>
+            <div class="col-xs-4">
+              =
+              $ {{d.value}}
+            </div>
           </div>
         </div>
         <div class="row">

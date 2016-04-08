@@ -3,34 +3,6 @@ angular.module('app', [])
     $scope.data = [];
     $scope.formData = {};
 
-    $scope.updateList = function() {
-      delete($scope.formData.name);
-      delete($scope.formData.description);
-      delete($scope.formData.value);
-      delete($scope.formData.quantity);
-
-      if ($scope.formData.type.id == "gadgets") {
-        $scope.current = $scope.gadgets;
-      } else {
-        $scope.current = [];
-      }
-    }
-
-    $scope.updateDescription = function() {
-      $scope.formData.description = $scope.formData.name.name;
-      $scope.formData.value = $scope.formData.name.cost;
-    }
-
-    $scope.add = function() {
-      $scope.formData.cost = $scope.formData.name.cost;
-      $scope.count_discount();
-      $scope.formData = {};
-    }
-
-    $scope.count_discount = function() {
-      $scope.data.push($scope.formData)
-    }
-
     $scope.types = [
       { id: 'gadgets', name: "Gadgets" },
       { id: 'fixed_discounts', name: "Fixed discount" },
@@ -60,4 +32,61 @@ angular.module('app', [])
       },
     ];
 
+    $scope.updateList = function() {
+      delete($scope.formData.name);
+      delete($scope.formData.description);
+      delete($scope.formData.value);
+      delete($scope.formData.quantity);
+
+      if ($scope.formData.type.id == "gadgets") {
+        $scope.current = $scope.gadgets;
+      } else {
+        $scope.current = [];
+      }
+    }
+
+    $scope.updateDescription = function() {
+      $scope.formData.description = $scope.formData.name.name;
+      $scope.formData.value = $scope.formData.name.cost;
+    }
+
+    $scope.add = function() {
+      $scope.formData.cost = $scope.formData.name.cost;
+      $scope.count_discount();
+      $scope.formData = {};
+    }
+
+    $scope.count_discount = function() {
+      $scope.data.push($scope.formData)
+    }
+
+    var sortableEle;
+
+    $scope.sortableArray = [
+      'One', 'Two', 'Three'
+    ];
+
+    $scope.add = function() {
+      $scope.sortableArray.push('Item: '+$scope.sortableArray.length);
+      sortableEle.refresh();
+    }
+
+    $scope.dragStart = function(e, ui) {
+      ui.item.data('start', ui.item.index());
+    }
+
+    $scope.dragEnd = function(e, ui) {
+      var start = ui.item.data('start'),
+      end = ui.item.index();
+
+      $scope.sortableArray.splice(end, 0,
+      $scope.sortableArray.splice(start, 1)[0]);
+
+      $scope.$apply();
+    }
+
+    sortableEle = $('#sortable').sortable({
+      start: $scope.dragStart,
+      update: $scope.dragEnd
+    });
 });
