@@ -2,16 +2,40 @@
   <head>
     <meta charset=utf-8 />
     <script src="assets/angular.min.js"></script>
-	<script src="assets/app.js"></script>
+    <script src="assets/jquery.min.js"></script>
+    <script src="assets/bootstrap.min.js"></script>
+    <script src="assets/app.js"></script>
+    <link href="assets/bootstrap.min.css" rel="stylesheet" media="all" />
     <link href="assets/style.css" rel="stylesheet" media="all" />
   </head>
   <body>
-      <div ng-app="myApp">
-	    <div ng-controller="myController">
-	        <div ng-repeat="k in gadgets">
-	        	{{k}}
-	        </div>
-	    </div>
+    <div ng-app="myApp">
+      <br>
+      <div ng-controller="mainController" class="container">
+
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+        Add Item
+      </button>
+
+      <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Add item</h4>
+            </div>
+            <div class="modal-body">
+              <select>
+                <option ng-repeat="x in gadgets">{{x.name}}</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Create</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
 	  </div>
   </body>
 </html>
